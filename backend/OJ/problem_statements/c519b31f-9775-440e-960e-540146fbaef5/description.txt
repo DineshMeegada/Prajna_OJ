@@ -1,0 +1,46 @@
+Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
+
+The overall run time complexity should be O(log (m+n)).
+
+INPUT FORMAT:
+The first line contains an integer m, the size of the first array.
+The next m lines each contain an integer element of nums1.
+The next line contains an integer n, the size of the second array.
+The next n lines each contain an integer element of nums2.
+
+OUTPUT FORMAT:
+Print the median of the two sorted arrays formatted to 5 decimal places.
+
+EXAMPLE 1:
+Input:
+2
+1
+3
+1
+2
+Output:
+2.00000
+Explanation: merged array = [1,2,3] and median is 2.
+
+EXAMPLE 2:
+Input:
+2
+1
+2
+2
+3
+4
+Output:
+2.50000
+Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.
+
+CONSTRAINTS:
+- nums1.length == m
+- nums2.length == n
+- 0 <= m <= 1000
+- 0 <= n <= 1000
+- 0 <= nums1[i], nums2[i] <= 1000
+
+HINT:
+If you understand the concept of partition in Quick Sort, this problem will be much easier.
+The key insight is to partition two arrays into two halves such that all elements in the left half are less than or equal to all elements in the right half.

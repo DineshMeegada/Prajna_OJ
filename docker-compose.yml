@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=oj_db
+      - POSTGRES_USER=oj_user
+      - POSTGRES_PASSWORD=oj_password
+    ports:
+      - "5435:5432"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend/OJ:/app/OJ
+    ports:
+      - "8001:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=oj_db
+      - DB_USER=oj_user
+      - DB_PASSWORD=oj_password
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - HOST_OJ_ROOT=${PWD}/backend/OJ
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A OJ worker -l info
+    volumes:
+      - ./backend/OJ:/app/OJ
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DB_HOST=db
+      - DB_NAME=oj_db
+      - DB_USER=oj_user
+      - DB_PASSWORD=oj_password
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - HOST_OJ_ROOT=${PWD}/backend/OJ
+    depends_on:
+      - db
+      - redis
+      - backend
+      - judge_image
+
+  judge_image:
+    build:
+      context: ./backend
+      dockerfile: judge_env/Dockerfile
+    image: online-judge-env
+    entrypoint: [ "echo", "Judge image built successfully" ]
+
+volumes:
+  postgres_data:

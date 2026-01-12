@@ -1,0 +1,13 @@
+Django>=5.0
+djangorestframework
+djangorestframework-simplejwt
+django-allauth
+django-cors-headers
+dj-rest-auth
+psycopg2-binary 
+requests
+celery
+redis
+cryptography
+docker
+google-genai
